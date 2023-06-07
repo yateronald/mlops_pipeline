@@ -1,7 +1,8 @@
 import yaml
 from sklearn.model_selection import train_test_split
 from typing import Text
-from utils.utils import get_logger
+
+# from utils.utils import get_logger
 import argparse
 import pandas as pd
 import os
@@ -11,11 +12,16 @@ def datasplit(config_file: Text) -> None:
     with open(config_file, "r") as f:
         config = yaml.safe_load(f)
 
-    logger = get_logger("Data Split", config["base"]["log_level"])
+    # logger = get_logger("Data Split", config["base"]["log_level"])
 
     df = pd.read_csv(config["data"]["datasets"])
+
     xtrain, xtest, ytrain, ytest = train_test_split(
-        df,
+        df.drop(
+            [config["train"]["target_col"]] + config["train"]["drop_cols"],
+            axis=1,
+        ),
+        df[config["train"]["target_col"]],
         test_size=config["data"]["split_ratio"],
         random_state=config["base"]["random_state"],
     )
@@ -25,7 +31,7 @@ def datasplit(config_file: Text) -> None:
     ytrain.to_csv(config["path"]["ytrain_path"], index=False)
     ytest.to_csv(config["path"]["ytest_path"], index=False)
 
-    logger.info("Data Split Successfully")
+    # logger.info("Data Split Successfully")
 
 
 if __name__ == "__main__":

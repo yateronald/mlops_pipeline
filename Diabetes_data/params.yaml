@@ -4,24 +4,52 @@ base:
 
 data:
   # loading data
-  datasets : "./data/raw/Diabete.csv"
-  split_ratio : 0.3
+  datasets: "./data/raw/Diabete.csv"
+  split_ratio: 0.3
 
 preprocess:
   # preprocessing data
-  scaler : "StandardScaler"
-  normalize : "PowerTransformer"
-
-
+  scaler: "StandardScaler"
+  normalize: "PowerTransformer"
 
 train:
-  clf_params:
-    "c":0.002
-    "solver":"lbfgs"
-    "multi_class":"auto"
-    "max_iter":100
+  log_reg:
+    params:
+      C: [0.002, 0.001, 0.01, 0.004]
+      solver: ["lbfgs"]
+      multi_class: ["auto"]
+      max_iter: [100, 200, 300, 400, 500]
+    name: "LogRe"
 
-  target_col: "class"
+  random_forest:
+    params:
+      n_estimators: [100, 200, 300, 400, 500]
+      max_depth: [5, 10, 15, 20, 25]
+      min_samples_split: [2, 3, 4, 5]
+      min_samples_leaf: [1, 2, 3, 4, 5]
+      max_features: ["auto", "sqrt", "log2"]
+      max_leaf_nodes: [None, 2, 3, 4, 5]
+    name: "RandomForest"
+
+  svm:
+    params:
+      C: [0.002, 0.001, 0.01, 0.004]
+      kernel: ["linear", "poly", "rbf", "sigmoid"]
+      degree: [2, 3, 4, 5]
+      gamma: ["scale", "auto"]
+    name: "svm"
+
+  knn:
+    params:
+      n_neighbors: [3, 4, 5, 6, 7]
+      weights: ["uniform", "distance"]
+      algorithm: ["auto", "ball_tree", "kd_tree", "brute"]
+      leaf_size: [10, 20, 30, 40, 50]
+      metric: ["euclidean", "manhattan", "minkowski"]
+    name: "knn"
+
+  target_col: "CLASS"
+  drop_cols: ["ID"]
 
 evaluate:
   # evaluating model
@@ -35,3 +63,4 @@ path:
   metrics_path: "./report/metrics.json"
   conf_matrix_path: "./report/confusion_matrix.png"
   final_data_path: "./data/final/"
+  tranform_path: "./data_trans_pipiline/transformation.joblib"
